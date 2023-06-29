@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { usePathname, useRouter } from "next/navigation"
 
-const PromptCard = ({ post, handleTagClick }) => {
+const PromptCard = ({ post, handleEdit, handleDelete, handleTagClick }) => {
   const [copied, setCopied] = useState("")
   const {data: session} = useSession()
   const pathName = usePathname();
@@ -17,14 +17,6 @@ const PromptCard = ({ post, handleTagClick }) => {
     setTimeout(() => {
       setCopied("")
     }, 3000)
-  }
-
-  const handleEdit = () => {
-
-  }
-
-  const handleDelete = () => {
-    
   }
 
   return (

@@ -34,7 +34,7 @@ const CreatePrompt = () => {
         router.push("/")
       }
     }catch(error){
-
+      console.log(error)
     }finally{
       setSubmitting(false)
     }
