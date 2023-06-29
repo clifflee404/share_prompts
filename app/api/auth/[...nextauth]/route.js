@@ -11,38 +11,39 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // callbacks: {
-  // },
-  async session({ session }) {
-    // store the user id from MongoDB to session
-    const sessionUser = await User.findOne({ email: session.user.email })
-    session.user.id = sessionUser._id.toString()
-
-    return session
-  },
-  async signIn({ profile }) {
-    // 每一个 next.js route 是一个 serverless route
-    // serverless -> lambda -> dymamodb
-    try {
-      await connectToDB()
-
-      // check if a user alredy exists
-      const userExists = await User.findOne({ email: profile.email })
-      // if not, create a new user
-      if (!userExists) {
-        await User.create({
-          email: profile.email,
-          username: profile.name.replace(" ", "").toLowerCase(),
-          image: profile.picture,
-        })
+  callbacks: {
+    async session({ session }) {
+      // store the user id from MongoDB to session
+      const sessionUser = await User.findOne({ email: session.user.email })
+      session.user.id = sessionUser._id.toString()
+  
+      return session
+    },
+    async signIn({ profile }) {
+      // 每一个 next.js route 是一个 serverless route
+      // serverless -> lambda -> dymamodb
+      try {
+        await connectToDB()
+  
+        // check if a user alredy exists
+        const userExists = await User.findOne({ email: profile.email })
+        // if not, create a new user
+        if (!userExists) {
+          await User.create({
+            email: profile.email,
+            username: profile.name.replace(" ", "").toLowerCase(),
+            image: profile.picture,
+          })
+        }
+  
+        return true
+      } catch (error) {
+        console.log("Error checking if user exists: ", error.message)
+        return false
       }
-
-      return true
-    } catch (error) {
-      console.log("Error checking if user exists: ", error.message)
-      return false
-    }
+    },
   },
+  
 })
 
 export { handler as GET, handler as POST }
