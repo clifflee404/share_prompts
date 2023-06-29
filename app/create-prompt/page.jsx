@@ -17,7 +17,7 @@ const CreatePrompt = () => {
   const {data: session } = useSession()
 
   const createPrompt = async (e) => {
-    e.preventDetault()
+    e.preventDefault()
     setSubmitting(true)
 
     try{
