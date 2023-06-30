@@ -33,8 +33,12 @@ export const PATCH = async (request, { params }) => {
     existingPrompt.tag = tag
 
     await existingPrompt.save()
-
-    return new Response('Successfully updated the prompt', { status: 200 })
+    
+    const resData = {
+      code: 0,
+      msg: 'Successfully updated the prompt'
+    }
+    return new Response(JSON.stringify(resData), { status: 200 })
   } catch (error) {
     return new Response('Error updating prompt', { status: 500 })
   }
@@ -49,7 +53,13 @@ export const DELETE = async (request, { params }) => {
     // Find the prompt by id and remove it
     await Prompt.findByIdAndRemove(params.id)
 
-    return new Response('Prompt deleted successfully', { status: 200 })
+    const resData = {
+      code: 0,
+      // Prompt deleted successfully
+      msg: 'Successfully deleted the prompt'
+    }
+
+    return new Response(JSON.stringify(resData), { status: 200 })
   } catch (error) {
     return new Response("Error deleting prompt", { status: 500 })
   }
