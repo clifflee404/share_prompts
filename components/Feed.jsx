@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from 'react'
-import PromptCard from "./PromptCard";
+import { useState, useEffect } from "react"
+import PromptCard from "./PromptCard"
 
-const PromptCardList = ({data, handleTagClick }) => {
+const PromptCardList = ({ data, handleTagClick }) => {
   return (
     <div className="mt-16 prompt_layout">
       {data.map((post) => (
@@ -18,13 +18,17 @@ const PromptCardList = ({data, handleTagClick }) => {
 }
 
 const Feed = () => {
-  const [searchText, setSearchText] = useState('')
   const [allPosts, setAllPosts] = useState([])
 
+  // search states
+  const [searchText, setSearchText] = useState("")
+  const [searchTimeout, setSearchTimeout] = useState(null)
+  const [searchedResults, setSearchedResults] = useState([])
+
   const fetchPosts = async () => {
-    const response = await fetch('/api/prompt')
+    const response = await fetch("/api/prompt")
     const data = await response.json()
-    console.log('---fetchPosts', data)
+    console.log("---fetchPosts", data)
     setAllPosts(data)
   }
 
@@ -32,12 +36,35 @@ const Feed = () => {
     fetchPosts()
   }, [])
 
-  const handleSearchChange = (e) => {
-
+  const filterPrompts = (searchText) => {
+    const regex = new RegExp(searchText, "i") // i flag for case-insensitive search
+    return allPosts.filter(
+      (item) =>
+        regex.test(item.creator.username) ||
+        regex.test(item.tag) ||
+        regex.test(item.prompt)
+    )
   }
 
-  const handleTagClick = () => {
+  const handleSearchChange = (e) => {
+    const searchValue = e.target.value
+    clearTimeout(searchTimeout)
+    setSearchText(searchValue)
 
+    // debounce 防抖
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = filterPrompts(searchValue)
+        setSearchedResults(searchResult)
+      }, 500)
+    )
+  }
+
+  const handleTagClick = (tagName) => {
+    setSearchText(tagName)
+
+    const searchTagResult = filterPrompts(tagName)
+    setSearchedResults(searchTagResult)
   }
 
   return (
@@ -53,10 +80,19 @@ const Feed = () => {
         />
       </form>
 
-      <PromptCardList
-        data={allPosts}
+      {/* <PromptCardList
+        data={searchText ? searchedResults : allPosts}
         handleTagClick={handleTagClick}
-      />
+      /> */}
+
+      {searchText ? (
+        <PromptCardList
+          data={searchedResults}
+          handleTagClick={handleTagClick}
+        />
+      ) : (
+        <PromptCardList data={allPosts} handleTagClick={handleTagClick} />
+      )}
     </section>
   )
 }
